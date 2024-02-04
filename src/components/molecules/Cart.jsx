@@ -1,35 +1,23 @@
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-
-const books = [
-  {
-    id: 1,
-    product_name: "Rayuela - Julio Cortázar",
-    imageUrl:
-      "https://firebasestorage.googleapis.com/v0/b/proyecto-libreria-22941.appspot.com/o/Libros%2FRayuela.jpg?alt=media&token=254e1c5f-8ed0-47ed-b908-fed605310547",
-    price: 6500,
-  },
-  {
-    id: 2,
-    product_name: "Paula - Isabel Allende",
-    imageUrl:
-      "https://firebasestorage.googleapis.com/v0/b/proyecto-libreria-22941.appspot.com/o/Libros%2FPaula-de-Isabel-Allende.jpg?alt=media&token=dbb22a8a-a0d2-4c9e-b4e1-107ed57091b0",
-    price: 5000,
-  },
-  {
-    id: 3,
-    product_name: "El Flaco - Feinmann, Jose Pablo",
-    imageUrl:
-      "https://firebasestorage.googleapis.com/v0/b/proyecto-libreria-22941.appspot.com/o/Libros%2Fel-flaco_9789504925491.jpg?alt=media&token=659319af-39a8-46eb-9cc7-0042d24aa56a",
-    price: 7900,
-  },
-];
+import { clearCart } from "../../redux/cartSlice";
+import CartItem from "../atoms/CartItem";
 
 const Cart = () => {
-  const navigate = useNavigate();
+  const cart = useSelector((state) => state.cart);
+  const dispatch = useDispatch();
 
+  //Navigation
+  const navigate = useNavigate();
   const goBack = () => {
     navigate(-1);
   };
+
+  const handleClearCart = () => {
+    dispatch(clearCart());
+  };
+
+  const total = cart.reduce((acc, el) => acc + el.price, 0);
 
   return (
     <div
@@ -63,7 +51,7 @@ const Cart = () => {
         <div className="z-10">
           <p>Mis compras</p>
         </div>
-        <div className="z-10">
+        <div className="z-10" onClick={handleClearCart}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -88,33 +76,40 @@ const Cart = () => {
       >
         {/* Items carrito */}
         <div className="w-full h-4/5 flex flex-col items-center mt-5 gap-2">
-          {books.map((book, i) => {
-            return (
-              <div
-                className="flex w-10/12 bg-white rounded-lg p-2 h-20 shadow-md"
-                key={i}
+          {cart && cart.length > 0 ? (
+            cart.map((book, i) => {
+              return <CartItem book={book} key={i} />;
+            })
+          ) : (
+            <div className="w-full h-full flex flex-col justify-center items-center text-white">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="w-20 h-20"
               >
-                <div className="w-1/4 flex">
-                  <img className="" src={book.imageUrl} />
-                </div>
-                <div className="flex flex-col">
-                  <p className="w-3/4 flex justify-center items-center text-sm">
-                    {book.product_name}
-                  </p>
-                  <p>${book.price}</p>
-                </div>
-              </div>
-            );
-          })}
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                />
+              </svg>
+              <p className="text-white text-3xl">Nada por aquí</p>
+            </div>
+          )}
         </div>
         {/* Totales */}
         <div className="w-full h-1/5 flex justify-between items-center p-5">
           <p className="flex items-center justify-center text-white text-3xl">
-            $19.690
+            {cart.length > 0 && `$${total}`}
           </p>
-          <button className="bg-white text-2xl px-10 py-6 h-8 rounded-full shadow-md flex justify-center items-center">
-            Pagar
-          </button>
+          {cart && cart.length > 0 && (
+            <button className="bg-white text-2xl px-10 py-6 h-8 rounded-full shadow-md flex justify-center items-center">
+              Pagar
+            </button>
+          )}
         </div>
       </div>
     </div>

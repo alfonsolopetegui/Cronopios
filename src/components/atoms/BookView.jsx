@@ -1,45 +1,43 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { Link, useNavigate } from "react-router-dom";
-
-const books = [
-  {
-    id: 1,
-    product_name: "Rayuela - Julio Cortázar",
-    imageUrl:
-      "https://firebasestorage.googleapis.com/v0/b/proyecto-libreria-22941.appspot.com/o/Libros%2FRayuela.jpg?alt=media&token=254e1c5f-8ed0-47ed-b908-fed605310547",
-    price: 6500,
-    description:
-      "El amor turbulento de Oliveira y La Maga, los amigos del Club de la Serpiente, las caminatas por Paría en busca del cielo y el infierno tienen su reverso en la aventura simétrica de Oliveira, Talita y Traveler en un Buenos Aires teñido por el recuerdo.",
-  },
-  {
-    id: 2,
-    product_name: "Paula - Isabel Allende",
-    imageUrl:
-      "https://firebasestorage.googleapis.com/v0/b/proyecto-libreria-22941.appspot.com/o/Libros%2FPaula-de-Isabel-Allende.jpg?alt=media&token=dbb22a8a-a0d2-4c9e-b4e1-107ed57091b0",
-    price: 5000,
-    description:
-      "Paula es un libro de memorias que deja el alma al descubierto, como una novela de suspenso, que se lee sin respirar. El punto de partida de estas páginas conmovedoras es una trágica experiencia personal.",
-  },
-  {
-    id: 3,
-    product_name: "El Flaco - Feinmann, Jose Pablo",
-    imageUrl:
-      "https://firebasestorage.googleapis.com/v0/b/proyecto-libreria-22941.appspot.com/o/Libros%2Fel-flaco_9789504925491.jpg?alt=media&token=659319af-39a8-46eb-9cc7-0042d24aa56a",
-    price: 7900,
-    description:
-      "El Flaco, que tiene como eje esa relación que se inició en 2003 y terminó en 2006, muestra un perfil hasta ahora totalmente desconocido de Néstor Kirchner.",
-  },
-];
+import { addItem } from "../../redux/cartSlice";
+import { addFavorite } from "../../redux/favoritesSlice";
 
 const BookView = () => {
+  const books = useSelector((state) => state.books);
+  const favorites = useSelector((state) => state.favorites);
+  const dispatch = useDispatch();
+
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  //dinamic routes
+  const { id } = useParams();
+  const selectedBook = books.find((book) => book.id === parseInt(id, 10));
+
+  //agregar al carrito
+  const handleAddItem = (book) => {
+    dispatch(addItem(book));
+  };
+
+  //agregar favorito
+  const handleAddFavorite = (book) => {
+   
+    dispatch(addFavorite(book));
+  };
+
+  //Navigation
   const navigate = useNavigate();
   const goBack = () => {
     navigate(-1);
   };
-  const { id } = useParams();
 
-  const selectedBook = books.find((book) => book.id === parseInt(id, 10));
+  
+
+  useEffect(() => {
+    setIsFavorite(favorites.some((el) => el.id === Number(id)));
+  }, [favorites, id]);
 
   return (
     <div className="w-full h-screen bg-white">
@@ -89,7 +87,40 @@ const BookView = () => {
       </div>
 
       <div className="h-3/6 p-5 flex justify-center">
-        <img className="h-full shadow-lg" src={selectedBook.imageUrl} alt="" />
+        <div className="shadow-lg relative">
+          <img className="h-full" src={selectedBook.imageUrl} alt="" />
+          <div
+            className="absolute bottom-4 right-4 bg-white w-8 h-8
+          rounded-full flex justify-center items-center shadow-lg"
+            onClick={() => handleAddFavorite(selectedBook)}
+          >
+            {isFavorite ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="#F8333C"
+                className="w-6 h-6"
+              >
+                <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" />
+              </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                />
+              </svg>
+            )}
+          </div>
+        </div>
       </div>
       <div
         className="h-2/6 w-full bg-rose-900 relative p-5"
@@ -101,6 +132,7 @@ const BookView = () => {
         <p
           className="bg-black text-white absolute right-0 bottom-0 shadow-lg p-4"
           style={{ borderTopLeftRadius: "40px" }}
+          onClick={() => handleAddItem(selectedBook)}
         >
           Agregar al carrito
         </p>

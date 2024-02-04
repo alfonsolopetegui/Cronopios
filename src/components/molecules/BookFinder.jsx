@@ -1,33 +1,13 @@
 import { Link } from "react-router-dom";
 import SmallCard from "../atoms/SmallCard";
 import { useState } from "react";
-
-const books = [
-  {
-    id: 1,
-    product_name: "Rayuela - Julio Cortázar",
-    imageUrl:
-      "https://firebasestorage.googleapis.com/v0/b/proyecto-libreria-22941.appspot.com/o/Libros%2FRayuela.jpg?alt=media&token=254e1c5f-8ed0-47ed-b908-fed605310547",
-    price: 6500,
-  },
-  {
-    id: 2,
-    product_name: "Paula - Isabel Allende",
-    imageUrl:
-      "https://firebasestorage.googleapis.com/v0/b/proyecto-libreria-22941.appspot.com/o/Libros%2FPaula-de-Isabel-Allende.jpg?alt=media&token=dbb22a8a-a0d2-4c9e-b4e1-107ed57091b0",
-    price: 5000,
-  },
-  {
-    id: 3,
-    product_name: "El Flaco - Feinmann, Jose Pablo",
-    imageUrl:
-      "https://firebasestorage.googleapis.com/v0/b/proyecto-libreria-22941.appspot.com/o/Libros%2Fel-flaco_9789504925491.jpg?alt=media&token=659319af-39a8-46eb-9cc7-0042d24aa56a",
-    price: 7900,
-  },
-];
+import { useSelector } from "react-redux";
+import Nav from "./Nav";
 
 const BookFinder = () => {
+  const books = useSelector((state) => state.books);
   const [search, setSearch] = useState("");
+  const [isNavVisible, setIsNavVisible] = useState(false);
 
   return (
     <div
@@ -37,6 +17,8 @@ const BookFinder = () => {
           "URL('https://firebasestorage.googleapis.com/v0/b/proyecto-libreria-22941.appspot.com/o/pexels-pixabay-433333.jpg?alt=media&token=076edd07-af5c-4645-b60d-47b6ed2bc416')",
       }}
     >
+      {isNavVisible && <Nav isNavVisible={isNavVisible} setIsNavVisible={setIsNavVisible} />}
+
       {/* Fondo con opacity */}
       <div className="absolute bg-red-700 w-full h-full opacity-50 z-2"></div>
 
@@ -44,6 +26,7 @@ const BookFinder = () => {
       <div className="w-full h-1/4 flex justify-between items-start p-5 text-2xl font-bold text-white">
         <div className="z-10">
           <svg
+            onClick={() => setIsNavVisible(true)}
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
